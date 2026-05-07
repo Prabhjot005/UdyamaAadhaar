@@ -6,4 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface InvalidDepartmentRecordRepository extends MongoRepository<InvalidDepartmentRecord, String> {
+
+    boolean existsByRecordHash(String recordHash);
 }

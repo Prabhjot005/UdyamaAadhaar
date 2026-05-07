@@ -32,11 +32,13 @@ public class DepartmentRecordService {
      *
      * @param kafkaMessage the Kafka message containing department record data
      * @param topic        the Kafka topic from which the message was received
+     * @param recordHash   deterministic hash of the incoming department record
      * @return saved ValidDepartmentRecord
      */
-    public ValidDepartmentRecord saveValidatedRecord(KafkaMessage kafkaMessage, String topic) {
+    public ValidDepartmentRecord saveValidatedRecord(KafkaMessage kafkaMessage, String topic, String recordHash) {
         try {
             ValidDepartmentRecord record = ValidDepartmentRecord.builder()
+                    .recordHash(recordHash)
                     .departmentRecordId(kafkaMessage.getDepartmentRecordId())
                     .name(kafkaMessage.getName())
                     .address(kafkaMessage.getAddress())
@@ -66,14 +68,16 @@ public class DepartmentRecordService {
      *
      * @param kafkaMessage the Kafka message containing department record data
      * @param topic        the Kafka topic from which the message was received
+     * @param recordHash   deterministic hash of the incoming department record
      * @param errors       validation errors explaining why the record is invalid
      * @return saved InvalidDepartmentRecord
      */
-    public InvalidDepartmentRecord saveInvalidatedRecord(KafkaMessage kafkaMessage, String topic,
+    public InvalidDepartmentRecord saveInvalidatedRecord(KafkaMessage kafkaMessage, String topic, String recordHash,
             List<ValidationError> errors) {
         try {
             LocalDateTime now = LocalDateTime.now();
             InvalidDepartmentRecord record = InvalidDepartmentRecord.builder()
+                    .recordHash(recordHash)
                     .departmentRecordId(kafkaMessage.getDepartmentRecordId())
                     .name(kafkaMessage.getName())
                     .address(kafkaMessage.getAddress())
@@ -107,6 +111,11 @@ public class DepartmentRecordService {
                         .message(error.getMessage())
                         .build())
                 .collect(Collectors.toList());
+    }
+
+    public boolean existsByRecordHash(String recordHash) {
+        return departmentRecordRepository.existsByRecordHash(recordHash)
+                || invalidDepartmentRecordRepository.existsByRecordHash(recordHash);
     }
 
     /**

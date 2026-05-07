@@ -14,6 +14,7 @@ import java.util.Map;
 public class ValidatedDepartmentRecordMessage {
 
     private String mongoId;
+    private String recordHash;
     private String departmentRecordId;
     private String name;
     private String address;
@@ -30,6 +31,7 @@ public class ValidatedDepartmentRecordMessage {
     public static ValidatedDepartmentRecordMessage from(ValidDepartmentRecord record) {
         return ValidatedDepartmentRecordMessage.builder()
                 .mongoId(record.getId())
+                .recordHash(record.getRecordHash())
                 .departmentRecordId(record.getDepartmentRecordId())
                 .name(record.getName())
                 .address(record.getAddress())

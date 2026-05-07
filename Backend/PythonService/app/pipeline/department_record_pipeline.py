@@ -2,7 +2,7 @@ import logging
 from dataclasses import dataclass
 
 from app.decision_engine import DecisionResult, decide_business_identity
-from app.embeddings import build_embedding_text, create_embedding
+from app.embeddings import build_embedding_reasoning, build_embedding_text, create_embedding
 from app.normalization import normalize_department_record
 from app.similarity_matching import DepartmentRecordMatch, find_department_record_matches
 from app.vector_storage import store_department_record_embedding
@@ -24,6 +24,7 @@ class DepartmentRecordProcessingResult:
 def process_department_record(record: dict) -> DepartmentRecordProcessingResult:
     normalized_record = normalize_department_record(record)
     embedding_text = build_embedding_text(normalized_record)
+    embedding_reasoning = build_embedding_reasoning(normalized_record)
     embedding_vector = create_embedding(embedding_text)
     matches = find_department_record_matches(
         normalized_record=normalized_record,
@@ -35,6 +36,7 @@ def process_department_record(record: dict) -> DepartmentRecordProcessingResult:
         normalized_record=normalized_record,
         matches=matches,
         embedding_text=embedding_text,
+        embedding_reasoning=embedding_reasoning,
         embedding_vector=embedding_vector,
     )
     logger.info(

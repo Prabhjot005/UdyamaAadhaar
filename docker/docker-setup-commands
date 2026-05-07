@@ -9,6 +9,19 @@ docker exec -it kafka-broker /opt/kafka/bin/kafka-console-producer.sh --topic un
 {"id":2,"name":"test2"}
 hello kafka
 
+{"id":3, "name":"test3"}
+curl -X POST http://localhost:8083/connectors ^
+  -H "Content-Type: application/json" ^
+  -H "Accept: application/json" ^
+{"name":"John Doe","address":"123 Main Street","pincode":"12345","city":"New York","gstin":"18AABCT1234H1Z0","panNumber":"ABCDE1234F","departmentRecordId":"dept001","departmentName":"Sales","sourceName":"DirectEntry"}
+
+'{"name":"Amit Kumar","address":"123 MG Road, Bengaluru","pincode":"560001","gstin":"29ABCDE1234F1Z5","panNumber":"ABCDE1234F","departmentRecordId":"DEPT123","departmentName":"GST Department","sourceName":"manual-test"}'
+
+{"name":"Amit Kumar","address":"123 MG Road, Bengaluru","pincode":"560001","gstin":"29ABCDE1234F1Z5","panNumber":"ABCDE1234F","departmentRecordId":"DEPT123","departmentName":"GST Department","sourceName":"manual-test"}
+{"name":"Amit Kumar technologies","address":"123 MG Road, BNGL","pincode":"560001","gstin":"29ABCDE1234F1Z5","panNumber":"ABCDE1234F","departmentRecordId":"DEPT123","departmentName":"GST Department","sourceName":"manual-test"}
+
+
+
 
 docker exec -it kafka-broker /opt/kafka/bin/kafka-console-consumer.sh --topic unvalidated_raw_data --from-beginning --bootstrap-server localhost:9092
 
@@ -18,6 +31,11 @@ curl -X POST http://localhost:8083/connectors ^
   -H "Content-Type: application/json" ^
   -H "Accept: application/json" ^
   -d "{\"name\":\"unvalidated_raw_data_sink\",\"config\":{\"connector.class\":\"com.mongodb.kafka.connect.MongoSinkConnector\",\"topics\":\"unvalidated_raw_data\",\"connection.uri\":\"mongodb://admin:admin@mongodb:27017\",\"database\":\"udyama\",\"collection\":\"unvalidated_department_data\",\"key.converter\":\"org.apache.kafka.connect.storage.StringConverter\",\"value.converter\":\"org.apache.kafka.connect.json.JsonConverter\",\"value.converter.schemas.enable\":\"false\",\"tasks.max\":\"1\",\"errors.tolerance\":\"all\",\"errors.log.enable\":\"true\",\"errors.deadletterqueue.topic.name\":\"dlq_unvalidated_raw_data\"}}"
+
+curl -X POST http://localhost:8083/connectors ^
+  -H "Content-Type: application/json" ^
+  -H "Accept: application/json" ^
+  -d "{\"name\": \"unvalidated_raw_data_sink\", \"config\": {\"connector.class\": \"com.mongodb.kafka.connect.MongoSinkConnector\", \"topics\": \"unvalidated_raw_data\", \"connection.uri\": \"mongodb://admin:admin@mongodb:27017\", \"database\": \"udyama\", \"collection\": \"unvalidated_department_data\", \"key.converter\": \"org.apache.kafka.connect.storage.StringConverter\", \"value.converter\": \"org.apache.kafka.connect.json.JsonConverter\", \"value.converter.schemas.enable\": \"false\", \"tasks.max\": \"1\", \"errors.tolerance\": \"all\", \"errors.log.enable\": \"true\", \"errors.deadletterqueue.topic.name\": \"dlq_unvalidated_raw_data\"}}"
 
 --Mongo connector plugin should be here 
 http://localhost:8083/connector-plugins

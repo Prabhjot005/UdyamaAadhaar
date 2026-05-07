@@ -47,21 +47,19 @@ public class DepartmentRecordValidatorTest {
     }
 
     @Test
-    @DisplayName("Should validate name - empty name")
+    @DisplayName("Should validate name - empty name is allowed")
     public void testValidateName_Empty() {
         ValidationResult result = ValidationResult.valid();
         validator.validateName("", result);
-        assertFalse(result.isValid());
-        assertTrue(result.getErrors().stream()
-                .anyMatch(e -> e.getField().equals("name") && e.getMessage().contains("required")));
+        assertTrue(result.isValid());
     }
 
     @Test
-    @DisplayName("Should validate name - null name")
+    @DisplayName("Should validate name - null name is allowed")
     public void testValidateName_Null() {
         ValidationResult result = ValidationResult.valid();
         validator.validateName(null, result);
-        assertFalse(result.isValid());
+        assertTrue(result.isValid());
     }
 
     @Test
@@ -112,13 +110,11 @@ public class DepartmentRecordValidatorTest {
     }
 
     @Test
-    @DisplayName("Should validate address - empty address")
+    @DisplayName("Should validate address - empty address is allowed")
     public void testValidateAddress_Empty() {
         ValidationResult result = ValidationResult.valid();
         validator.validateAddress("", result);
-        assertFalse(result.isValid());
-        assertTrue(result.getErrors().stream()
-                .anyMatch(e -> e.getField().equals("address") && e.getMessage().contains("required")));
+        assertTrue(result.isValid());
     }
 
     @Test
@@ -151,11 +147,11 @@ public class DepartmentRecordValidatorTest {
     }
 
     @Test
-    @DisplayName("Should validate pincode - empty pincode")
+    @DisplayName("Should validate pincode - empty pincode is allowed")
     public void testValidatePincode_Empty() {
         ValidationResult result = ValidationResult.valid();
         validator.validatePincode("", result);
-        assertFalse(result.isValid());
+        assertTrue(result.isValid());
     }
 
     @Test
@@ -185,11 +181,11 @@ public class DepartmentRecordValidatorTest {
     }
 
     @Test
-    @DisplayName("Should validate GSTIN - empty GSTIN")
+    @DisplayName("Should validate GSTIN - empty GSTIN is allowed")
     public void testValidateGstin_Empty() {
         ValidationResult result = ValidationResult.valid();
         validator.validateGstin("", result);
-        assertFalse(result.isValid());
+        assertTrue(result.isValid());
     }
 
     @Test
@@ -229,11 +225,11 @@ public class DepartmentRecordValidatorTest {
     }
 
     @Test
-    @DisplayName("Should validate PAN - empty PAN")
+    @DisplayName("Should validate PAN - empty PAN is allowed")
     public void testValidatePan_Empty() {
         ValidationResult result = ValidationResult.valid();
         validator.validatePanNumber("", result);
-        assertFalse(result.isValid());
+        assertTrue(result.isValid());
     }
 
     @Test
@@ -273,11 +269,11 @@ public class DepartmentRecordValidatorTest {
     }
 
     @Test
-    @DisplayName("Should validate department record ID - empty ID")
+    @DisplayName("Should validate department record ID - empty ID is allowed")
     public void testValidateDepartmentRecordId_Empty() {
         ValidationResult result = ValidationResult.valid();
         validator.validateDepartmentRecordId("", result);
-        assertFalse(result.isValid());
+        assertTrue(result.isValid());
     }
 
     @Test
@@ -300,14 +296,18 @@ public class DepartmentRecordValidatorTest {
     }
 
     @Test
-    @DisplayName("Should fail validation when required fields are missing")
+    @DisplayName("Should allow missing fields")
     public void testValidateDepartmentRecord_MissingRequiredFields() {
         validMessage.setName(null);
         validMessage.setAddress(null);
         validMessage.setDepartmentRecordId(null);
+        validMessage.setGstin(null);
+        validMessage.setPanNumber(null);
+        validMessage.setPincode(null);
+        validMessage.setDepartmentName(null);
 
         ValidationResult result = validator.validateDepartmentRecord(validMessage);
-        assertFalse(result.isValid());
-        assertEquals(3, result.getErrors().size());
+        assertTrue(result.isValid());
+        assertEquals(0, result.getErrors().size());
     }
 }

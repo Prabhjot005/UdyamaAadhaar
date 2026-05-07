@@ -1,6 +1,7 @@
 package com.hashkey.validation_service.kafka;
 
 import com.hashkey.validation_service.validation.DepartmentRecordValidator;
+import com.hashkey.validation_service.validation.DepartmentRecordHashService;
 import com.hashkey.validation_service.validation.ValidationResult;
 import com.hashkey.validation_service.validation.ValidationException;
 import com.hashkey.validation_service.mongodb.document.ValidDepartmentRecord;
@@ -21,6 +22,9 @@ public class KafkaSubscriberService {
 
     @Autowired
     private DepartmentRecordValidator departmentRecordValidator;
+
+    @Autowired
+    private DepartmentRecordHashService departmentRecordHashService;
 
     @Autowired
     private DepartmentRecordService departmentRecordService;
@@ -63,20 +67,27 @@ public class KafkaSubscriberService {
         // TODO Auto-generated method stub
 
         try {
+            String recordHash = departmentRecordHashService.computeHash(message);
+
+            if (departmentRecordService.existsByRecordHash(recordHash)) {
+                logger.info("Duplicate department record skipped. recordHash={}", recordHash);
+                return;
+            }
+
             // Validate the department record
             ValidationResult validationResult = departmentRecordValidator.validateDepartmentRecord(message);
 
             if (!validationResult.isValid()) {
                 logger.warn("Department record validation failed: {}", validationResult.getErrors());
 
-                departmentRecordService.saveInvalidatedRecord(message, topic, validationResult.getErrors());
+                departmentRecordService.saveInvalidatedRecord(message, topic, recordHash, validationResult.getErrors());
                 return ;
                 //throw new ValidationException("Department record validation failed", validationResult.getErrors());
             }
 
             logger.info("Department record validation passed. Saving to MongoDB...");
 
-            ValidDepartmentRecord savedRecord = departmentRecordService.saveValidatedRecord(message, topic);
+            ValidDepartmentRecord savedRecord = departmentRecordService.saveValidatedRecord(message, topic, recordHash);
             logger.info("Department record successfully saved to MongoDB");
 
             kafkaPublisherService.publish(validDepartmentRecordsTopic,

@@ -1,0 +1,22 @@
+db.createUser({
+user: "testUser",
+pwd: "admin",
+db: "udyama",
+roles: [
+{
+role: "readWrite",
+db: "udyama"
+},
+],
+});
+
+
+
+mongoId: 69facd7aeaf22f5720ec9afd | departmentRecordId: DEPT123 | departmentName: GST Department | sourceName: manual-test | additionalProperties: {} | createdAt: 2026-05-06T10:41:22.949217700 | updatedAt: 2026-05-06T10:41:22.949217700 | kafkaTopic: unvalidated_raw_data | normalized_name: amit kumar | normalized_address: 123 MG ROAD, BENGALURU | normalized_pincode: 560001 | normalized_pan: ABCDE1234F | normalized_gstin: 29ABCDE1234F1Z5 | normalized_gstin_state: Karnataka
+
+{"mongoId":"69facd7aeaf22f5720ec9afd","departmentRecordId":"DEPT123","departmentName":"GST Department","sourceName":"manual-test","additionalProperties":{},"createdAt":"2026-05-06T10:41:22.949217700","updatedAt":"2026-05-06T10:41:22.949217700","kafkaTopic":"unvalidated_raw_data","normalized_name":"amit kumar","normalized_address":"123 MG ROAD, BENGALURU","normalized_landmarks":[],"normalized_pincode":"560001","normalized_pan":"ABCDE1234F","normalized_gstin":"29ABCDE1234F1Z5","normalized_gstin_state":"Karnataka"}
+
+
+
+
+{"name":"Amit Kumar technologies","address":"123 MG Road, BNGL","pincode":"560001","gstin":"29ABCDE1234F1Z5","panNumber":"ABCDE1234F","departmentRecordId":"DEPT123","departmentName":"GST Department","sourceName":"manual-test"}

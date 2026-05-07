@@ -3,4 +3,7 @@ Backend/PythonService/.env
 .venv/
 **/.venv/
 Backend/PythonService/.venv/
+__pycache__/
+**/__pycache__/
+*.py[cod]
 docker/milvus/volumes/

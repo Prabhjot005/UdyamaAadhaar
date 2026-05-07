@@ -10,6 +10,8 @@ import java.util.Optional;
 @Repository
 public interface DepartmentRecordRepository extends MongoRepository<ValidDepartmentRecord, String> {
 
+    boolean existsByRecordHash(String recordHash);
+
     /**
      * Find department record by departmentRecordId
      */

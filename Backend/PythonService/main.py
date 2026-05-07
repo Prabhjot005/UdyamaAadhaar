@@ -26,7 +26,7 @@ app = FastAPI(title="UBID Engine Core Service", lifespan=lifespan)
 
 @app.get("/")
 def greet():
-    return {"message": "UBID Engine Core Service"}
+    return {"message": "UBID Engine Core Service is running!"}
 
 
 @app.get("/health")

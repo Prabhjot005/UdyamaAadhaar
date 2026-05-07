@@ -1,7 +1,10 @@
 import os
 import uuid
+import logging
 from functools import lru_cache
 
+
+logger = logging.getLogger("ubid-engine-core.vector-storage")
 
 DEFAULT_MILVUS_COLLECTION_NAME = "department_record_embeddings"
 EMBEDDING_DIMENSION = 384
@@ -34,6 +37,10 @@ def mongo_id_from_record(record: dict) -> str:
 
 def scalar_value(record: dict, key: str) -> str:
     return str(record.get(key) or "")
+
+
+def _escape_expr_value(value: str) -> str:
+    return value.replace("\\", "\\\\").replace('"', '\\"')
 
 
 def connect_to_milvus() -> None:
@@ -116,6 +123,22 @@ def get_department_record_collection():
     return collection
 
 
+def find_existing_record_id_by_mongo_id(mongo_id: str) -> str | None:
+    if not mongo_id:
+        return None
+
+    collection = get_department_record_collection()
+    results = collection.query(
+        expr=f'mongo_id == "{_escape_expr_value(mongo_id)}"',
+        output_fields=["record_id"],
+        limit=1,
+    )
+    if not results:
+        return None
+
+    return results[0].get("record_id")
+
+
 def store_department_record_embedding(
     original_record: dict,
     normalized_record: dict,
@@ -129,6 +152,15 @@ def store_department_record_embedding(
 
     record_id = record_id_from_record(original_record)
     mongo_id = mongo_id_from_record(original_record)
+    existing_record_id = find_existing_record_id_by_mongo_id(mongo_id)
+    if existing_record_id:
+        logger.info(
+            "Skipping Milvus insert because mongo_id already exists: mongo_id=%s; record_id=%s",
+            mongo_id,
+            existing_record_id,
+        )
+        return existing_record_id
+
     normalized_gstin = scalar_value(normalized_record, "normalized_gstin")
     normalized_pincode = scalar_value(normalized_record, "normalized_pincode")
     normalized_pan = scalar_value(normalized_record, "normalized_pan")
