@@ -1,0 +1,6 @@
+Backend/PythonService/.env
+.env
+.venv/
+**/.venv/
+Backend/PythonService/.venv/
+docker/milvus/volumes/

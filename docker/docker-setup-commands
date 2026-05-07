@@ -1,0 +1,35 @@
+docker exec -it kafka-broker /opt/kafka/bin/kafka-topics.sh --create --topic unvalidated_raw_data --bootstrap-server localhost:9092 --partitions 1 --replication-factor 1
+docker exec -it kafka-broker /opt/kafka/bin/kafka-topics.sh --create --topic dlq_unvalidated_raw_data --bootstrap-server localhost:9092 --partitions 1 --replication-factor 1
+docker exec -it kafka-broker /opt/kafka/bin/kafka-topics.sh --create --topic valid_department_records  --bootstrap-server localhost:9092 --partitions 1 --replication-factor 1
+
+docker exec -it kafka-broker /opt/kafka/bin/kafka-topics.sh --list --bootstrap-server localhost:9092
+
+docker exec -it kafka-broker /opt/kafka/bin/kafka-console-producer.sh --topic unvalidated_raw_data --bootstrap-server localhost:9092
+{"id":1,"name":"test1"}
+{"id":2,"name":"test2"}
+hello kafka
+
+
+docker exec -it kafka-broker /opt/kafka/bin/kafka-console-consumer.sh --topic unvalidated_raw_data --from-beginning --bootstrap-server localhost:9092
+
+docker exec connect confluent-hub install --no-prompt mongodb/kafka-connect-mongodb:1.9.0
+
+curl -X POST http://localhost:8083/connectors ^
+  -H "Content-Type: application/json" ^
+  -H "Accept: application/json" ^
+  -d "{\"name\":\"unvalidated_raw_data_sink\",\"config\":{\"connector.class\":\"com.mongodb.kafka.connect.MongoSinkConnector\",\"topics\":\"unvalidated_raw_data\",\"connection.uri\":\"mongodb://admin:admin@mongodb:27017\",\"database\":\"udyama\",\"collection\":\"unvalidated_department_data\",\"key.converter\":\"org.apache.kafka.connect.storage.StringConverter\",\"value.converter\":\"org.apache.kafka.connect.json.JsonConverter\",\"value.converter.schemas.enable\":\"false\",\"tasks.max\":\"1\",\"errors.tolerance\":\"all\",\"errors.log.enable\":\"true\",\"errors.deadletterqueue.topic.name\":\"dlq_unvalidated_raw_data\"}}"
+
+--Mongo connector plugin should be here 
+http://localhost:8083/connector-plugins
+
+-- list all connectors 
+http://localhost:8083/connectors
+
+-- check the status of a particular connector
+http://localhost:8083/connectors/unvalidated_raw_data_sink/status
+
+
+--mongo db collections 
+dlq_department_records
+unvalidated_department_data
+valid_department_records
