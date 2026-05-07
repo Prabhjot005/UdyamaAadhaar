@@ -18,3 +18,11 @@ def create_embedding(text: str) -> list[float]:
     model = _get_embedding_model()
     embedding = model.encode(text, normalize_embeddings=True)
     return embedding.tolist()
+
+
+def build_embedding_text(normalized_record: dict) -> str:
+    return " | ".join(
+        f"{key}: {value}"
+        for key, value in normalized_record.items()
+        if value not in (None, "", [])
+    )

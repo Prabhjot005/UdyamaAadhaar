@@ -17,6 +17,7 @@ from app.normalization.identifier_normalizer import (
     normalize_pincode,
 )
 from app.normalization.name_normalizer import NameNormalizationOptions, NameNormalizer, normalize_name
+from app.normalization.department_record_normalizer import normalize_department_record
 
 __all__ = [
     "AddressNormalizationOptions",
@@ -32,6 +33,7 @@ __all__ = [
     "PincodeNormalizer",
     "normalize_address",
     "normalize_address_with_metadata",
+    "normalize_department_record",
     "normalize_gstin",
     "normalize_name",
     "normalize_pan",

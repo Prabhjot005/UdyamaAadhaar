@@ -5,6 +5,7 @@ import logging
 import uvicorn
 
 from app.config import settings
+from app.decision_engine import initialize_decision_engine_storage
 from app.kafka.consumer_manager import KafkaConsumerManager
 
 logging.basicConfig(level=logging.INFO)
@@ -14,6 +15,7 @@ kafka_consumer_manager = KafkaConsumerManager(settings.kafka_subscriptions)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    initialize_decision_engine_storage()
     kafka_consumer_manager.start()
     yield
     kafka_consumer_manager.stop()
