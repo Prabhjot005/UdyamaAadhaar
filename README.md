@@ -97,7 +97,7 @@ Event Master :
 
 UBID Status :
 
-<img width="1570" height="756" alt="image" src="https://github.com/user-attachments/assets/9a3cde89-2a26-40c2-bf04-2ab8500f3009" />
+<img width="1418" height="779" alt="image" src="https://github.com/user-attachments/assets/3e9ff50c-f98f-48ca-b9d6-d31a395026a0" />
 
 Review Dashboards : 
 
