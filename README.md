@@ -89,20 +89,20 @@ Resulting UBIDs can be obtained from the UBID master dashboard and UBID status d
 
 UBID Master : 
 
-<img width="1600" height="900" alt="image" src="https://github.com/user-attachments/assets/e3042200-d218-42ee-97a6-b6516df8d7e9" />
+<img width="1560" height="812" alt="image" src="https://github.com/user-attachments/assets/bd777a52-0b88-4009-a082-69039e19bf50" />
 
 Event Master : 
 
-<img width="1600" height="900" alt="image" src="https://github.com/user-attachments/assets/2b4c2b5b-3d01-4b35-923d-81cd184f4270" />
+<img width="1516" height="800" alt="image" src="https://github.com/user-attachments/assets/fa90e05f-6e77-43c1-ba97-f93485362265" />
 
 UBID Status :
 
-<img width="1600" height="900" alt="image" src="https://github.com/user-attachments/assets/98a60b63-8d1b-4b53-8977-913910532806" />
+<img width="1570" height="756" alt="image" src="https://github.com/user-attachments/assets/9a3cde89-2a26-40c2-bf04-2ab8500f3009" />
 
 Review Dashboards : 
 
-<img width="1600" height="900" alt="image" src="https://github.com/user-attachments/assets/95b54a5a-cfd9-4442-9030-9634ad2c0d3f" />
+<img width="1587" height="781" alt="image" src="https://github.com/user-attachments/assets/268b3d8c-5e58-4006-80b1-310336095583" />
 
 Event Review Dashboard : 
 
-<img width="1600" height="900" alt="image" src="https://github.com/user-attachments/assets/274bb515-3354-49e8-9f5e-21ef990da516" />
+<img width="1593" height="762" alt="image" src="https://github.com/user-attachments/assets/8bab3ec5-b122-4bc5-8d73-de835ff68410" />
