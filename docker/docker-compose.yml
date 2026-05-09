@@ -1,9 +1,5 @@
 version: "3.9"
 
-networks:
-  backend:
-    driver: bridge
-
 volumes:
   postgres_data:
   mongo_data:
@@ -13,35 +9,25 @@ services:
     extends:
       file: ./postgres/docker-compose.yaml
       service: postgres
-    networks:
-      - backend
   pgadmin:
     extends:
       file: ./postgres/docker-compose.yaml
       service: pgadmin
-    networks:
-      - backend
 
   mongodb:
     extends:
       file: ./mongodb/docker-compose.yaml
       service: mongodb
-    networks:
-      - backend
 
   mongo-express:
     extends:
       file: ./mongodb/docker-compose.yaml
       service: mongo-express
-    networks:
-      - backend
 
   kafka-broker:
     extends:
       file: ./kafka/docker-compose.yaml
       service: broker
-    networks:
-      - backend
 
   # cloudbeaver:
   #   extends:
@@ -54,8 +40,6 @@ services:
     extends:
       file: ./kafka/kafka-connect-docker-compose.yaml
       service: connect
-    networks:
-      - backend
 
   # control-center:
   #   extends:

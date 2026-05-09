@@ -1,0 +1,234 @@
+﻿services:
+  # -------------------------
+  # Databases
+  # -------------------------
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: udyama
+    ports:
+      - "5432:5432"
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d udyama"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: prabhjotw005@ril.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin
+    ports:
+      - "27017:27017"
+    restart: unless-stopped
+
+  mongo-express:
+    image: mongo-express:latest
+    container_name: mongo-express
+    environment:
+      ME_CONFIG_MONGODB_URL: mongodb://admin:admin@mongodb:27017/?authSource=admin
+      ME_CONFIG_MONGODB_ADMINUSERNAME: admin
+      ME_CONFIG_MONGODB_ADMINPASSWORD: admin
+      ME_CONFIG_BASICAUTH_USERNAME: admin
+      ME_CONFIG_BASICAUTH_PASSWORD: admin
+    ports:
+      - "8081:8081"
+    restart: unless-stopped
+    depends_on:
+      - mongodb
+
+  # -------------------------
+  # Kafka
+  # -------------------------
+  kafka-broker:
+    image: apache/kafka:latest
+    container_name: kafka-broker
+    hostname: kafka-broker
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-broker:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_NODE_ID: 1
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka-broker:29093
+      KAFKA_LISTENERS: PLAINTEXT://kafka-broker:29092,CONTROLLER://kafka-broker:29093,PLAINTEXT_HOST://0.0.0.0:9092
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LOG_DIRS: /tmp/kraft-combined-logs
+      CLUSTER_ID: MkU3OEVBNTcwNTJENDM2Qk
+    ports:
+      - "9092:9092"
+
+  # -------------------------
+  # Milvus
+  # -------------------------
+  etcd:
+    image: quay.io/coreos/etcd:v3.5.5
+    container_name: milvus-etcd
+    environment:
+      ETCD_AUTO_COMPACTION_MODE: revision
+      ETCD_AUTO_COMPACTION_RETENTION: "1000"
+      ETCD_QUOTA_BACKEND_BYTES: "4294967296"
+      ETCD_SNAPSHOT_COUNT: "10000"
+    command: etcd -advertise-client-urls=http://127.0.0.1:2379 -listen-client-urls http://0.0.0.0:2379 --data-dir /etcd
+    volumes:
+      - ../docker/milvus/volumes/etcd:/etcd
+    healthcheck:
+      test: ["CMD", "etcdctl", "endpoint", "health"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+  minio:
+    image: minio/minio:RELEASE.2023-03-20T20-16-18Z
+    container_name: milvus-minio
+    environment:
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin
+    command: minio server /minio_data --console-address ":9001"
+    volumes:
+      - ../docker/milvus/volumes/minio:/minio_data
+    ports:
+      - "9001:9001"
+      - "9000:9000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+  standalone:
+    image: milvusdb/milvus:v2.3.0
+    container_name: milvus-standalone
+    command: ["milvus", "run", "standalone"]
+    environment:
+      ETCD_ENDPOINTS: etcd:2379
+      MINIO_ADDRESS: minio:9000
+    volumes:
+      - ../docker/milvus/volumes/milvus:/var/lib/milvus
+    ports:
+      - "19530:19530"
+      - "9091:9091"
+    depends_on:
+      etcd:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9091/healthz"]
+      interval: 30s
+      start_period: 90s
+      timeout: 20s
+      retries: 3
+
+  attu:
+    image: zilliz/attu:latest
+    container_name: milvus-attu
+    environment:
+      MILVUS_URL: standalone:19530
+    ports:
+      - "8000:3000"
+    depends_on:
+      standalone:
+        condition: service_healthy
+
+  # -------------------------
+  # Application Services
+  # -------------------------
+  ubid_engine_core_service:
+    image: prabhw005/ubid_engine_core_service:latest
+    container_name: ubid_engine_core_service
+    environment:
+      KAFKA_VALID_DEPARTMENT_RECORDS_GROUP_ID: ubid_engine_valid_department_records_test20
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: "5432"
+      POSTGRES_DB: udyama
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      KAFKA_BOOTSTRAP_SERVERS: kafka-broker:29092
+      MILVUS_HOST: standalone
+      MILVUS_PORT: "19530"
+    ports:
+      - "8006:8006"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka-broker:
+        condition: service_started
+      standalone:
+        condition: service_healthy
+
+  event_engine_core_service:
+    image: prabhw005/event_engine_core_service:latest
+    container_name: event_engine_core_service
+    environment:
+      KAFKA_VALID_EVENTS_GROUP_ID: event_engine_valid_events_test20
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: "5432"
+      POSTGRES_DB: udyama
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      KAFKA_BOOTSTRAP_SERVERS: kafka-broker:29092
+      UBID_MATCH_API_URL: http://ubid_engine_core_service:8006/ubids/match
+      EVENT_CATEGORY_MATCH_API_URL: http://ubid_engine_core_service:8006/event-categories/match
+    ports:
+      - "8008:8008"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka-broker:
+        condition: service_started
+      ubid_engine_core_service:
+        condition: service_started
+
+  validation_service:
+    image: prabhw005/validation_service:latest
+    container_name: validation_service
+    environment:
+      spring.kafka.consumer.group-id: validation_service_reprocess_group_test25
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka-broker:29092
+      SPRING_DATA_MONGODB_HOST: mongodb
+      SPRING_DATA_MONGODB_PORT: "27017"
+      SPRING_DATA_MONGODB_DATABASE: udyama
+      SPRING_DATA_MONGODB_USERNAME: admin
+      SPRING_DATA_MONGODB_PASSWORD: admin
+      SPRING_DATA_MONGODB_AUTHENTICATION_DATABASE: admin
+      spring.mongodb.host: mongodb
+    ports:
+      - "8010:8010"
+    depends_on:
+      - kafka-broker
+      - mongodb
+
+  udyama_aadhaar_admin_app:
+    image: prabhw005/udyama_aadhaar_admin_app:latest
+    container_name: udyama_aadhaar_admin_app
+    ports:
+      - "3003:3003"
+    depends_on:
+      - ubid_engine_core_service
+      - event_engine_core_service
+      - validation_service

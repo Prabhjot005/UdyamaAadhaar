@@ -20,3 +20,39 @@ mongoId: 69facd7aeaf22f5720ec9afd | departmentRecordId: DEPT123 | departmentName
 
 
 {"name":"Amit Kumar technologies","address":"123 MG Road, BNGL","pincode":"560001","gstin":"29ABCDE1234F1Z5","panNumber":"ABCDE1234F","departmentRecordId":"DEPT123","departmentName":"GST Department","sourceName":"manual-test"}
+
+
+
+{"name": "Amit Kumar technologies", "address": "123 MG Road, BNGL", "pincode": "560001", "gstin": "29ABCDE1234F1Z5", "panNumber": "ABCDE1234F", "departmentRecordId": "DEPT_GST_001", "departmentName": "GST Department", "sourceName": "manual-test"}
+{"name": "Amit Kumar Tech", "address": "123 M.G. Road, Bengaluru", "pincode": "560001", "gstin": "29ABCDE1234F1Z5", "panNumber": "ABCDE1234F", "departmentRecordId": "DEPT_LAB_99", "departmentName": "Labour Department", "sourceName": "manual-test"}
+{"name": "S.V. Enterprises", "address": "Plot No 45, Peenya Industrial Area", "pincode": "560058", "gstin": null, "panNumber": null, "departmentRecordId": "FAC_101", "departmentName": "Factories & Boilers", "sourceName": "manual-test"}
+{"name": "SV Enterprises PVT LTD", "address": "Plot 45, Phase 1, Peenya", "pincode": "560058", "gstin": null, "panNumber": null, "departmentRecordId": "KSPCB_77", "departmentName": "KSPCB", "sourceName": "manual-test"}
+{"name": "Karnataka Steel Corp", "address": null, "pincode": "560102", "gstin": "29ZZZZZ9999Z1Z0", "panNumber": "ZZZZZ9999Z", "departmentRecordId": "DEPT_GST_404", "departmentName": "GST Department", "sourceName": "manual-test"}
+{"name": null, "address": "Site 789, Electronic City", "pincode": null, "gstin": null, "panNumber": null, "departmentRecordId": "BESCOM_001", "departmentName": "BESCOM", "sourceName": "manual-test", "phone": "9876543210"}
+{"name": "Precision Tools & Dies", "address": "Suite 201, HSR Layout Sector 2", "pincode": "560102", "gstin": "29BCDEF5678G2Z1", "panNumber": "BCDEF5678G", "departmentRecordId": "KSPCB_DUP", "departmentName": "KSPCB", "sourceName": "manual-test"}
+{"name": "Precision Tools & Dies", "address": "Suite 201, HSR Layout Sector 2", "pincode": "560102", "gstin": "29BCDEF5678G2Z1", "panNumber": "BCDEF5678G", "departmentRecordId": "KSPCB_DUP", "departmentName": "KSPCB", "sourceName": "manual-test"}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{"eventType":"REGISTRATION_SUBMITTED","gstin":"27ABCDE1234F1Z5","sourceName":"GST Portal","name":"Alpha Traders","eventDate":"2026-05-08","amount":12000}
+{"eventType":"LICENSE_RENEWED","pan":"ABCDE1234F","sourceName":"Municipal Licensing","name":"Beta Foods","licenseNumber":"LIC-2026-001"}
+{"eventType":"TAX_PAYMENT_RECEIVED","ubid":"UBID-8F2A91C4D5E6","sourceName":"Treasury","paymentReference":"PAY-10001","amount":56000}
+{"eventType":"INSPECTION_COMPLETED","departmentRecordId":"DEPT-REC-1004","sourceName":"Labour Department","inspectionStatus":"PASSED","officer":"R Mehta"}
+{"eventType":"ADDRESS_UPDATED","departmentRecordId":"DEPT-REC-1005","name":"Delta Manufacturing","newAddress":"Plot 21, Industrial Area, Pune","pincode":"411001"}
+{"eventType":"GSTIN_LINKED","gstin":"29ABCDE1234F1Z3","departmentRecordId":"DEPT-REC-1006","sourceName":"GST Portal","linkStatus":"ACTIVE"}
+{"eventType":"COMPLIANCE_NOTICE_SENT","panNumber":"PQRST6789L","sourceName":"Compliance System","noticeId":"NOTICE-2026-44","severity":"LOW"}
+{"gstin":"27ABCDE1234F1Z5","sourceName":"GST Portal","name":"Missing Event Type Ltd","eventDate":"2026-05-08"}
+{"eventType":"UNKNOWN_RECORD_RECEIVED","sourceName":"Anonymous Feed","eventDate":"2026-05-08","remarks":"No GSTIN PAN UBID or department record id"}
+{"eventType":"INVALID_IDENTIFIER_EVENT","gstin":"BADGSTIN123","pan":"BADPAN","sourceName":"GST Portal","name":"Invalid Id Co"}

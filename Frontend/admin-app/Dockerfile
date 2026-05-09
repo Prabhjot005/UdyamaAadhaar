@@ -1,13 +1,15 @@
-FROM node:24.11.0-alpine
+FROM node:20-alpine
 
 WORKDIR /app
 
-COPY package*.json .
-RUN npm install
+COPY package*.json ./
+RUN npm ci
 
 COPY . .
 
-EXPOSE 3003 
+ENV HOST=0.0.0.0
+ENV PORT=3003
 
-CMD ["npm", "start"]
+EXPOSE 3003
 
+CMD ["npm", "run", "start"]
