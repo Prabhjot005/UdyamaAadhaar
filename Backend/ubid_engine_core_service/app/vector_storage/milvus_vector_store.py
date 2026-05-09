@@ -98,9 +98,6 @@ def _validate_collection_schema(collection) -> None:
     field_names = {field.name for field in collection.schema.fields}
     required_fields = {
         "record_id",
-        "data_record_id",
-        "department_record_id",
-        "source_system",
         "normalized_gstin",
         "normalized_pincode",
         "normalized_pan",
@@ -133,6 +130,11 @@ def get_department_record_collection():
 
     collection.load()
     return collection
+
+
+def collection_field_names(collection=None) -> set[str]:
+    collection = collection or get_department_record_collection()
+    return {field.name for field in collection.schema.fields}
 
 
 def find_existing_record_id_by_data_record_id(data_record_id: str) -> str | None:

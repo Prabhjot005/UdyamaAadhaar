@@ -1,0 +1,96 @@
+import argparse
+import json
+import time
+from pathlib import Path
+
+from kafka import KafkaProducer
+
+
+BASE_DIR = Path(__file__).resolve().parent
+BOOTSTRAP_SERVERS = "localhost:9092"
+UNVERIFIED_RAW_DATA_TOPIC = "unvalidated_raw_data"
+UNVALIDATED_EVENTS_TOPIC = "unvalidated_events"
+
+def create_producer() -> KafkaProducer:
+    return KafkaProducer(
+        bootstrap_servers=BOOTSTRAP_SERVERS,
+        value_serializer=lambda value: json.dumps(value).encode("utf-8"),
+        acks="all",
+    )
+
+
+def resolve_data_file(*file_names: str) -> Path:
+    for file_name in file_names:
+        path = BASE_DIR / file_name
+        if path.exists():
+            return path
+    raise FileNotFoundError(f"None of these files were found: {', '.join(file_names)}")
+
+
+def load_records(path: Path) -> list[dict]:
+    content = path.read_text(encoding="utf-8").strip()
+    if not content:
+        return []
+
+    if content.startswith("["):
+        records = json.loads(content)
+        if not isinstance(records, list):
+            raise ValueError(f"{path.name} must contain a JSON array or JSONL records")
+        return records
+
+    records = []
+    for line_number, line in enumerate(content.splitlines(), start=1):
+        cleaned_line = line.strip()
+        if cleaned_line:
+            try:
+                records.append(json.loads(cleaned_line))
+            except json.JSONDecodeError as exc:
+                raise ValueError(f"Invalid JSON in {path.name} at line {line_number}: {exc}") from exc
+    return records
+
+
+def stream_records_from_file(file_path: Path, topic: str, delay_seconds: float = 0.25) -> int:
+    records = load_records(file_path)
+    producer = create_producer()
+
+    try:
+        for index, record in enumerate(records, start=1):
+            print(f"Sending {index}/{len(records)} to {topic}: {record}")
+            metadata = producer.send(topic, value=record).get(timeout=10)
+            print(f"Sent to {metadata.topic} partition={metadata.partition} offset={metadata.offset}")
+            if delay_seconds:
+                time.sleep(delay_seconds)
+        producer.flush()
+    finally:
+        producer.close()
+
+    print(f"Completed streaming {len(records)} records from {file_path.name} to {topic}")
+    return len(records)
+
+
+def stream_unverified_event_test_data_to_unverified_raw_data(delay_seconds: float = 0.25) -> int:
+    file_path = resolve_data_file("unverified_raw_test_data")
+    return stream_records_from_file(file_path, UNVERIFIED_RAW_DATA_TOPIC, delay_seconds)
+
+
+def stream_unverified_raw_test_event_data_to_unvalidated_events(delay_seconds: float = 0.25) -> int:
+    file_path = resolve_data_file("unverified_test_event_data", "unverfied_raw_test_event_data")
+    return stream_records_from_file(file_path, UNVALIDATED_EVENTS_TOPIC, delay_seconds)
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Stream local JSON/JSONL test data to Kafka topics.")
+    parser.add_argument(
+        "--mode",
+        choices=["raw-data", "events", "all"],
+        default="all",
+        help="raw-data streams unverified_event_test_data to unverified_raw_data; events streams event data to unvalidated_events.",
+    )
+    parser.add_argument("--delay", type=float, default=0.25, help="Delay in seconds between Kafka messages.")
+    args = parser.parse_args()
+
+    if args.mode in ("raw-data", "all"):
+        stream_unverified_event_test_data_to_unverified_raw_data(args.delay)
+
+    if args.mode in ("events", "all"):
+        stream_unverified_raw_test_event_data_to_unvalidated_events(args.delay)

@@ -2,10 +2,13 @@ package com.hashkey.validation_service.kafka;
 
 import com.hashkey.validation_service.validation.DepartmentRecordValidator;
 import com.hashkey.validation_service.validation.DepartmentRecordHashService;
+import com.hashkey.validation_service.validation.EventValidator;
 import com.hashkey.validation_service.validation.ValidationResult;
 import com.hashkey.validation_service.validation.ValidationException;
 import com.hashkey.validation_service.mongodb.document.ValidDepartmentRecord;
+import com.hashkey.validation_service.mongodb.document.ValidEvent;
 import com.hashkey.validation_service.mongodb.service.DepartmentRecordService;
+import com.hashkey.validation_service.mongodb.service.EventService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,13 +30,22 @@ public class KafkaSubscriberService {
     private DepartmentRecordHashService departmentRecordHashService;
 
     @Autowired
+    private EventValidator eventValidator;
+
+    @Autowired
     private DepartmentRecordService departmentRecordService;
+
+    @Autowired
+    private EventService eventService;
 
     @Autowired
     private KafkaPublisherService kafkaPublisherService;
 
     @Value("${app.kafka.topic.validDepartmentRecords}")
     private String validDepartmentRecordsTopic;
+
+    @Value("${app.kafka.topic.validEvents}")
+    private String validEventsTopic;
 
     @KafkaListener(topics = "${app.kafka.topic}", groupId = "${spring.kafka.consumer.group-id}")
     public void listen(KafkaMessage message, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
@@ -113,7 +125,26 @@ public class KafkaSubscriberService {
 
         try {
             logger.info("Received event from Kafka topic {}: {}", topic, message);
-            // TODO: add validation logic for events
+
+            String eventHash = departmentRecordHashService.computeHash(message);
+
+            if (eventService.existsByEventHash(eventHash)) {
+                logger.info("Duplicate event skipped. eventHash={}", eventHash);
+                return;
+            }
+
+            ValidationResult validationResult = eventValidator.validateEvent(message);
+
+            if (!validationResult.isValid()) {
+                logger.warn("Event validation failed: {}", validationResult.getErrors());
+                eventService.saveInvalidatedEvent(message, topic, eventHash, validationResult.getErrors());
+                return;
+            }
+
+            ValidEvent savedEvent = eventService.saveValidatedEvent(message, topic, eventHash);
+            kafkaPublisherService.publish(validEventsTopic, ValidatedEventMessage.from(savedEvent));
+            logger.info("Validated event published to Kafka topic {} with MongoDB ID: {}",
+                    validEventsTopic, savedEvent.getId());
         } catch (Exception e) {
             logger.error("Error processing event from topic {}: {}", topic, message, e);
         }

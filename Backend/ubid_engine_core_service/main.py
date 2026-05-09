@@ -13,7 +13,14 @@ from app.decision_engine import (
     initialize_decision_engine_storage,
     resolve_review,
 )
+from app.event_category_master import (
+    EventCategoryMatchRequest,
+    EventCategorySeedRequest,
+    match_event_category,
+    seed_event_category_master,
+)
 from app.kafka.consumer_manager import KafkaConsumerManager
+from app.match_service import UbidMatchRequest, match_ubid
 
 logging.basicConfig(level=logging.INFO)
 
@@ -31,7 +38,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(title="UBID Engine Core Service", lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
+    allow_origins=["http://localhost:3003", "http://127.0.0.1:3003"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -90,5 +97,23 @@ def get_ubids(
     return fetch_ubid_master(search=search, status=status, source_system=source_system)
 
 
+@app.post("/ubids/match")
+def match_ubid_api(request: UbidMatchRequest):
+    return match_ubid(request)
+
+
+@app.post("/event-categories/master")
+def seed_event_categories_api(request: EventCategorySeedRequest):
+    return seed_event_category_master(request)
+
+
+@app.post("/event-categories/match")
+def match_event_category_api(request: EventCategoryMatchRequest):
+    match = match_event_category(request)
+    if not match:
+        raise HTTPException(status_code=404, detail="No event category match found")
+    return match
+
+
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8001, reload=True)
+    uvicorn.run("main:app", host="0.0.0.0", port=8006, reload=True)

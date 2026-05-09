@@ -375,6 +375,71 @@ def _lookup_ubid_for_match(cursor, match: DepartmentRecordMatch | None) -> str |
     return row[0] if row else match.record_id
 
 
+def enrich_department_record_matches(matches: list[DepartmentRecordMatch]) -> list[dict[str, Any]]:
+    connection = _get_connection()
+    enriched_matches: list[dict[str, Any]] = []
+
+    with connection.cursor() as cursor:
+        for match in matches:
+            ubid = _lookup_ubid_for_match(cursor, match)
+            matched_record = None
+
+            if match.data_record_id:
+                cursor.execute(
+                    """
+                    SELECT
+                        id,
+                        raw_record,
+                        normalized_record,
+                        normalized_name,
+                        normalized_address,
+                        normalized_other_address,
+                        normalized_gstin,
+                        normalized_pan,
+                        normalized_pincode,
+                        source_system,
+                        created_at
+                    FROM incoming_department_records
+                    WHERE data_record_id = %s
+                    ORDER BY created_at DESC
+                    LIMIT 1
+                    """,
+                    (match.data_record_id,),
+                )
+                row = cursor.fetchone()
+                if row:
+                    matched_record = {
+                        "incoming_record_id": row[0],
+                        "raw_record": _json_value(row[1]),
+                        "normalized_record": _json_value(row[2]),
+                        "normalized_name": row[3],
+                        "normalized_address": row[4],
+                        "normalized_other_address": row[5],
+                        "normalized_gstin": row[6],
+                        "normalized_pan": row[7],
+                        "normalized_pincode": row[8],
+                        "source_system": row[9],
+                        "created_at": _iso_datetime(row[10]),
+                    }
+
+            enriched_matches.append(
+                {
+                    "ubid": ubid,
+                    "record_id": match.record_id,
+                    "data_record_id": match.data_record_id,
+                    "similarity_score": match.similarity_score,
+                    "match_type": match.match_type,
+                    "matched_field": match.matched_field,
+                    "embedding_text": match.embedding_text,
+                    "metadata": match.metadata or {},
+                    "matched_record": matched_record,
+                }
+            )
+
+    connection.commit()
+    return enriched_matches
+
+
 def _insert_incoming_record(cursor, incoming_record: dict, normalized_record: dict) -> int:
     cursor.execute(
         """
@@ -565,7 +630,7 @@ def _match_reason(match: DepartmentRecordMatch) -> str:
         return f"Matched by scalar hard key '{match.matched_field}' and assigned similarity score 1.0."
     if match.match_type == "none":
         return "No Milvus candidate was returned; placeholder row documents the no-match decision."
-    return "Matched by cosine vector similarity over normalized_name, normalized_address, normalized_other_address, and normalized_pincode embeddings."
+    return "Matched by weighted vector similarity using name 65%, pincode 25%, and address 10% after Milvus candidate retrieval."
 
 
 def _insert_decision(cursor, incoming_record_id: int, embedding_id: int, status: str, ubid: str | None, review_id: str | None, top_match: DepartmentRecordMatch | None) -> int:
@@ -813,6 +878,7 @@ def fetch_reviews(
         review_columns = [description[0] for description in cursor.description]
         review_rows = cursor.fetchall()
         if not review_rows:
+            connection.commit()
             return []
 
         reviews_by_id: dict[str, dict[str, Any]] = {}
@@ -917,6 +983,7 @@ def fetch_reviews(
             }
             reviews_by_id[review_id]["candidates"].append(candidate)
 
+    connection.commit()
     return list(reviews_by_id.values())
 
 
@@ -1043,6 +1110,7 @@ def fetch_ubid_master(
         columns = [description[0] for description in cursor.description]
         rows = [dict(zip(columns, row)) for row in cursor.fetchall()]
 
+    connection.commit()
     ubids: list[dict[str, Any]] = []
     for row in rows:
         raw_record = _json_value(row["raw_record"]) or {}

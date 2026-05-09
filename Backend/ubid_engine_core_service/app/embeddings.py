@@ -54,9 +54,10 @@ def build_embedding_reasoning(normalized_record: dict) -> dict:
         "included_fields": included_fields,
         "excluded_fields": excluded_fields,
         "reason": (
-            "Vector similarity uses normalized business name, normalized address, "
-            "normalized other address, and normalized pincode only. Hard identifiers "
-            "such as data record ID, GSTIN, "
+            "Vector retrieval uses normalized business name, normalized address, "
+            "normalized other address, and normalized pincode only. Final vector "
+            "candidate scoring applies name 65%, pincode 25%, and address 10%. "
+            "Hard identifiers such as data record ID, GSTIN, "
             "PAN, and other metadata are excluded from embeddings and handled through "
             "scalar matching or decision metadata."
         ),

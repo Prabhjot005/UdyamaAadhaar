@@ -1,6 +1,9 @@
 docker exec -it kafka-broker /opt/kafka/bin/kafka-topics.sh --create --topic unvalidated_raw_data --bootstrap-server localhost:9092 --partitions 1 --replication-factor 1
 docker exec -it kafka-broker /opt/kafka/bin/kafka-topics.sh --create --topic dlq_unvalidated_raw_data --bootstrap-server localhost:9092 --partitions 1 --replication-factor 1
 docker exec -it kafka-broker /opt/kafka/bin/kafka-topics.sh --create --topic valid_department_records  --bootstrap-server localhost:9092 --partitions 1 --replication-factor 1
+docker exec -it kafka-broker /opt/kafka/bin/kafka-topics.sh --create --topic unvalidated_events --bootstrap-server localhost:9092 --partitions 1 --replication-factor 1
+docker exec -it kafka-broker /opt/kafka/bin/kafka-topics.sh --create --topic dlq_unvalidated_events --bootstrap-server localhost:9092 --partitions 1 --replication-factor 1
+docker exec -it kafka-broker /opt/kafka/bin/kafka-topics.sh --create --topic valid_events  --bootstrap-server localhost:9092 --partitions 1 --replication-factor 1
 
 docker exec -it kafka-broker /opt/kafka/bin/kafka-topics.sh --list --bootstrap-server localhost:9092
 
@@ -51,3 +54,12 @@ http://localhost:8083/connectors/unvalidated_raw_data_sink/status
 dlq_department_records
 unvalidated_department_data
 valid_department_records
+valid_events
+dlq_events
+
+python KafkaDataGeneration/Kafka_dummy_data_streaming --mode raw-data
+python KafkaDataGeneration/Kafka_dummy_data_streaming --mode events
+python KafkaDataGeneration/Kafka_dummy_data_streaming --mode all
+
+
+./psql -U admin -d postgres

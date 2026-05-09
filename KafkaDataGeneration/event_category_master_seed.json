@@ -1,0 +1,154 @@
+{
+  "categories": [
+    {
+      "eventCategory": "Inspection",
+      "descriptiveVectorText": "A government officer or department representative visited, inspected, verified, audited, or checked the business premises, factory, shop, or establishment.",
+      "baseWeight": 8.5,
+      "recommendedDecayConstant": 0.01
+    },
+    {
+      "eventCategory": "Renewal",
+      "descriptiveVectorText": "The business renewed a license, registration, permit, approval, certificate, or compliance document with a department.",
+      "baseWeight": 8,
+      "recommendedDecayConstant": 0.006
+    },
+    {
+      "eventCategory": "Filing",
+      "descriptiveVectorText": "The business submitted a compliance form, return, declaration, report, document, or regulatory filing.",
+      "baseWeight": 6.5,
+      "recommendedDecayConstant": 0.008
+    },
+    {
+      "eventCategory": "Consumption",
+      "descriptiveVectorText": "The business showed electricity, water, gas, utility, or operational resource consumption indicating active business operations.",
+      "baseWeight": 9.5,
+      "recommendedDecayConstant": 0.018
+    },
+    {
+      "eventCategory": "Payment",
+      "descriptiveVectorText": "The business made a fee payment, tax payment, challan payment, penalty payment, or service charge payment.",
+      "baseWeight": 6,
+      "recommendedDecayConstant": 0.012
+    },
+    {
+      "eventCategory": "Notice",
+      "descriptiveVectorText": "A department issued a notice, warning, objection, compliance reminder, or deficiency communication to the business.",
+      "baseWeight": 3.5,
+      "recommendedDecayConstant": 0.015
+    },
+    {
+      "eventCategory": "Approval",
+      "descriptiveVectorText": "A department approved, granted, accepted, cleared, or verified a business request, application, or compliance action.",
+      "baseWeight": 5.5,
+      "recommendedDecayConstant": 0.007
+    },
+    {
+      "eventCategory": "Rejection",
+      "descriptiveVectorText": "A department rejected, denied, refused, or returned a business application, filing, or compliance request.",
+      "baseWeight": 2.5,
+      "recommendedDecayConstant": 0.014
+    },
+    {
+      "eventCategory": "Closure",
+      "descriptiveVectorText": "The business registration, license, factory, shop, or establishment was closed, cancelled, surrendered, terminated, or marked inactive.",
+      "baseWeight": -10,
+      "recommendedDecayConstant": 0.02
+    },
+    {
+      "eventCategory": "Audit",
+      "descriptiveVectorText": "A detailed review, audit, assessment, inspection, or compliance examination was conducted for the business.",
+      "baseWeight": 7.5,
+      "recommendedDecayConstant": 0.009
+    },
+    {
+      "eventCategory": "Registration",
+      "descriptiveVectorText": "A new business, factory, shop, establishment, or license registration was created in a department system.",
+      "baseWeight": 5,
+      "recommendedDecayConstant": 0.003
+    },
+    {
+      "eventCategory": "Complaint",
+      "descriptiveVectorText": "A complaint, grievance, issue, dispute, or objection was raised against or by the business.",
+      "baseWeight": 2,
+      "recommendedDecayConstant": 0.018
+    },
+    {
+      "eventCategory": "Penalty",
+      "descriptiveVectorText": "A fine, penalty, violation charge, enforcement action, or non-compliance fee was imposed on the business.",
+      "baseWeight": 4.5,
+      "recommendedDecayConstant": 0.013
+    },
+    {
+      "eventCategory": "Modification",
+      "descriptiveVectorText": "The business updated, corrected, amended, or modified registration details, address, ownership, or license information.",
+      "baseWeight": 3,
+      "recommendedDecayConstant": 0.01
+    },
+    {
+      "eventCategory": "Suspension",
+      "descriptiveVectorText": "The business license, operation, approval, or registration was suspended temporarily by a department.",
+      "baseWeight": -7.5,
+      "recommendedDecayConstant": 0.017
+    },
+    {
+      "eventCategory": "Cancellation",
+      "descriptiveVectorText": "A registration, approval, permit, or license associated with the business was permanently cancelled.",
+      "baseWeight": -9,
+      "recommendedDecayConstant": 0.025
+    },
+    {
+      "eventCategory": "Compliance Success",
+      "descriptiveVectorText": "The business successfully passed compliance checks, audits, inspections, or regulatory verification.",
+      "baseWeight": 7,
+      "recommendedDecayConstant": 0.007
+    },
+    {
+      "eventCategory": "Non-Compliance",
+      "descriptiveVectorText": "The business failed regulatory checks, inspections, or compliance verification requirements.",
+      "baseWeight": -4,
+      "recommendedDecayConstant": 0.014
+    },
+    {
+      "eventCategory": "Utility Disconnection",
+      "descriptiveVectorText": "Electricity, water, gas, or utility services associated with the business were disconnected or terminated.",
+      "baseWeight": -8.5,
+      "recommendedDecayConstant": 0.022
+    },
+    {
+      "eventCategory": "Factory Operation",
+      "descriptiveVectorText": "Operational activity such as production, manufacturing, machine usage, or industrial processing was recorded.",
+      "baseWeight": 9,
+      "recommendedDecayConstant": 0.016
+    },
+    {
+      "eventCategory": "Employee Filing",
+      "descriptiveVectorText": "Labour, payroll, PF, ESI, or employee-related records were submitted or updated.",
+      "baseWeight": 7,
+      "recommendedDecayConstant": 0.009
+    },
+    {
+      "eventCategory": "Tax Filing",
+      "descriptiveVectorText": "GST, professional tax, or other tax-related returns were filed by the business.",
+      "baseWeight": 7.5,
+      "recommendedDecayConstant": 0.008
+    },
+    {
+      "eventCategory": "Environmental Clearance",
+      "descriptiveVectorText": "Pollution control, environmental approval, or KSPCB-related clearance activity was recorded.",
+      "baseWeight": 6,
+      "recommendedDecayConstant": 0.005
+    },
+    {
+      "eventCategory": "Fire Safety Renewal",
+      "descriptiveVectorText": "Fire department approval, renewal, inspection, or safety verification activity occurred.",
+      "baseWeight": 6.5,
+      "recommendedDecayConstant": 0.006
+    },
+    {
+      "eventCategory": "Dormancy Notice",
+      "descriptiveVectorText": "The department marked the business as inactive, dormant, non-operational, or unresponsive.",
+      "baseWeight": -6,
+      "recommendedDecayConstant": 0.018
+    }
+  ]
+}
