@@ -82,6 +82,39 @@
     ports:
       - "9092:9092"
 
+  connect:
+    image: confluentinc/cp-kafka-connect-base:7.3.1
+    container_name: connect
+    hostname: connect
+    depends_on:
+      - kafka-broker
+      - mongodb
+    ports:
+      - "8083:8083"
+    restart: always
+    environment:
+      CONNECT_BOOTSTRAP_SERVERS: kafka-broker:29092
+      CONNECT_REST_ADVERTISED_HOST_NAME: connect
+      CONNECT_GROUP_ID: compose-connect-group
+      CONNECT_CONFIG_STORAGE_TOPIC: docker-connect-configs
+      CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: "1"
+      CONNECT_OFFSET_STORAGE_TOPIC: docker-connect-offsets
+      CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: "1"
+      CONNECT_STATUS_STORAGE_TOPIC: docker-connect-status
+      CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: "1"
+      CONNECT_KEY_CONVERTER: org.apache.kafka.connect.storage.StringConverter
+      CONNECT_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      CONNECT_VALUE_CONVERTER_SCHEMAS_ENABLE: "false"
+      CONNECT_PLUGIN_PATH: /usr/share/java,/etc/kafka-connect/jars,/usr/share/confluent-hub-components
+    command:
+      - bash
+      - -c
+      - |
+        confluent-hub install --no-prompt mongodb/kafka-connect-mongodb:1.9.0 && \
+        /etc/confluent/docker/run
+    volumes:
+      - ../plugins:/etc/kafka-connect/jars
+
   # -------------------------
   # Milvus
   # -------------------------
@@ -162,7 +195,7 @@
     image: prabhw005/ubid_engine_core_service:latest
     container_name: ubid_engine_core_service
     environment:
-      KAFKA_VALID_DEPARTMENT_RECORDS_GROUP_ID: ubid_engine_valid_department_records_test20
+      KAFKA_VALID_DEPARTMENT_RECORDS_GROUP_ID: ubid_engine_valid_department_records_test29
       POSTGRES_HOST: postgres
       POSTGRES_PORT: "5432"
       POSTGRES_DB: udyama
@@ -185,7 +218,7 @@
     image: prabhw005/event_engine_core_service:latest
     container_name: event_engine_core_service
     environment:
-      KAFKA_VALID_EVENTS_GROUP_ID: event_engine_valid_events_test20
+      KAFKA_VALID_EVENTS_GROUP_ID: event_engine_valid_events_test29
       POSTGRES_HOST: postgres
       POSTGRES_PORT: "5432"
       POSTGRES_DB: udyama
@@ -208,7 +241,7 @@
     image: prabhw005/validation_service:latest
     container_name: validation_service
     environment:
-      spring.kafka.consumer.group-id: validation_service_reprocess_group_test25
+      spring.kafka.consumer.group-id: validation_service_reprocess_group_test29
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka-broker:29092
       SPRING_DATA_MONGODB_HOST: mongodb
       SPRING_DATA_MONGODB_PORT: "27017"
